@@ -12,7 +12,7 @@ Implementations of the models in the paper "Deconvolutional Paragraph Representa
 * Options: options can be made by changing `option` class in the demo.py code. 
 
 - `opt.n_hidden`: number of hidden units.
-- `opt.layer`: number of CNN/DCNN layer $\in$[2,3,4].
+- `opt.layer`: number of CNN/DCNN layer [2,3,4].
 - `opt.lr`: learning rate.
 - `opt.batch_size`: number of batchsize.
 
