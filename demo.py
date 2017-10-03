@@ -53,7 +53,7 @@ class Options(object):
         self.tanh = True  # activation fun for the top layer of cnn, otherwise relu
         self.model = 'cnn_deconv'  # 'cnn_rnn', 'rnn_rnn' , default: cnn_deconv
 
-        self.permutation = 2
+        self.permutation = 0
         self.substitution = 's'  # Deletion(d), Insertion(a), Substitution(s) and Permutation(p)
 
         self.W_emb = None
@@ -66,7 +66,7 @@ class Options(object):
         self.embed_size = 300
         self.lr = 1e-5
         self.layer = 3
-        self.stride = [2, 2]  # for two layer cnn/deconv , use self.stride[0]
+        self.stride = [2, 2, 2]  # for two layer cnn/deconv , use self.stride[0]
         self.batch_size = 32
         self.max_epochs = 100
         self.n_gan = 900  # self.filter_size * 3
@@ -342,24 +342,12 @@ def main():
 
                     val_set = [prepare_for_bleu(s) for s in val_sents]
                     [bleu2s, bleu3s, bleu4s] = cal_BLEU([prepare_for_bleu(s) for s in res['rec_sents']], {0: val_set})
-                    print 'Val BLEU (2,3,4): ' + ' '.join([str(round(it, 3)) for it in (bleu2s, bleu3s, bleu4s)])
-
-                    if opt.model != 'rnn_rnn' and opt.model != 'cnn_rnn':
-                        print "Org Probs:" + " ".join(
-                            [ixtoword[x_val_batch_org[0][i]] + '(' + str(np.round(res['all_p'][i], 1)) + ')' for i in
-                             range(len(res['rec_sents'][0])) if res['rec_sents'][0][i] != 0])
-                        print "Gen Probs:" + " ".join(
-                            [ixtoword[res['rec_sents'][0][i]] + '(' + str(np.round(res['gen_p'][i], 1)) + ')' for i in
-                             range(len(res['rec_sents'][0])) if res['rec_sents'][0][i] != 0])
+                    print 'Val BLEU (2,3,4): ' + ' '.join([str(round(it, 3)) for it in (bleu2s, bleu3s, bleu4s)]
 
                     summary = sess.run(merged, feed_dict={x_: x_val_batch, x_org_: x_val_batch_org})
                     test_writer.add_summary(summary, uidx)
                     opt.is_train = True
 
-                def test_input(text):
-                    x_input = sent2idx(text, wordtoix, opt)
-                    res = sess.run(res_, feed_dict={x_: x_input, x_org_: x_batch_org})
-                    print "Reconstructed:" + " ".join([ixtoword[x] for x in res['rec_sents'][0] if x != 0])
 
                 if uidx % opt.print_freq == 0:
                     print("Iteration %d: loss %f " % (uidx, loss))
@@ -369,8 +357,6 @@ def main():
                     if opt.model == 'rnn_rnn' or opt.model == 'cnn_rnn':
                         print "Reconstructed:" + " ".join([ixtoword[x] for x in res['rec_sents_feed_y'][0] if x != 0])
                     print "Reconstructed:" + " ".join([ixtoword[x] for x in res['rec_sents'][0] if x != 0])
-
-                    # print "Probs:" + " ".join([ixtoword[res['rec_sents'][0][i]] +'(' +str(np.round(res['all_p'][i],2))+')' for i in range(len(res['rec_sents'][0])) if res['rec_sents'][0][i] != 0])
 
                     summary = sess.run(merged, feed_dict={x_: x_batch, x_org_: x_batch_org})
                     train_writer.add_summary(summary, uidx)
