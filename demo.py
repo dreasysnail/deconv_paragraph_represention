@@ -8,7 +8,7 @@ TextCNN
 
 import os
 
-GPUID = 0
+GPUID = 1
 os.environ['CUDA_VISIBLE_DEVICES'] = str(GPUID)
 
 import tensorflow as tf
@@ -81,7 +81,7 @@ class Options(object):
         # batch norm & dropout
         self.batch_norm = False
         self.dropout = True
-        self.dropout_ratio = 0.5
+        self.dropout_ratio = 1.0
         self.is_train = True
 
         self.discrimination = False
@@ -342,8 +342,7 @@ def main():
 
                     val_set = [prepare_for_bleu(s) for s in val_sents]
                     [bleu2s, bleu3s, bleu4s] = cal_BLEU([prepare_for_bleu(s) for s in res['rec_sents']], {0: val_set})
-                    print 'Val BLEU (2,3,4): ' + ' '.join([str(round(it, 3)) for it in (bleu2s, bleu3s, bleu4s)]
-
+                    print 'Val BLEU (2,3,4): ' + ' '.join([str(round(it, 3)) for it in (bleu2s, bleu3s, bleu4s)])
                     summary = sess.run(merged, feed_dict={x_: x_val_batch, x_org_: x_val_batch_org})
                     test_writer.add_summary(summary, uidx)
                     opt.is_train = True
