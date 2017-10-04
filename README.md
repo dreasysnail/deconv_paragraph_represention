@@ -16,8 +16,8 @@ Implementations of the models in the paper "Deconvolutional Paragraph Representa
 - `opt.lr`: learning rate.
 - `opt.batch_size`: number of batchsize.
 
-Training roughly takes 6-7 hours (around 10 epochs) to converge on a K80 GPU machine.
-
+* Training roughly takes 6-7 hours (around 10 epochs) to converge on a K80 GPU machine.
+* See `output.txt` for a sample of screen output.
 
 ## Data: 
 * download from [data](https://drive.google.com/file/d/0B52eYWrYWqIpQzhBNkVxaV9mMjQ/view)
