@@ -26,7 +26,7 @@ Implementations of the models in the paper "Deconvolutional Paragraph Representa
 For any question or suggestions, feel free to contact yz196@duke.edu
 
 ## Citation 
-* Arxiv link: [https://arxiv.org/abs/1708.04729](https://arxiv.org/abs/1708.04729)
+* Arxiv link: [https://arxiv.org/abs/1706.03850](https://arxiv.org/abs/1706.03850)
 ```latex
 @inproceedings{zhang2017deconvolutional,
   title={Deconvolutional Paragraph Representation Learning},
