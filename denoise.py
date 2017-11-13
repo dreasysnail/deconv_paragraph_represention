@@ -79,3 +79,16 @@ def mixed_noise_sent(sents, opt):
     sents = add_sent(sents, opt)
     sents = substitute_sent(sents, opt)
     return sents
+    
+def substitute_sent_char(sents, opt):
+    # substitute single word
+    sents_p = []
+    for ss in range(len(sents)):
+        sent_temp = sents[ss][:]
+        permute_choice = [ic for ic in range(len(sent_temp)) if sent_temp[ic] != 1]
+        idx_s= np.random.choice(permute_choice, size=int(opt.permutation * (len(permute_choice))), replace=True)
+
+        for ii in range(len(idx_s)):
+            sent_temp[idx_s[ii]] = np.random.choice(list(range(2,28)))
+        sents_p.append(sent_temp)
+    return sents_p
