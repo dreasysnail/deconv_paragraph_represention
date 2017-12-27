@@ -8,7 +8,7 @@ Implementations of the models in the paper "Deconvolutional Paragraph Representa
 
 
 ## Run 
-* Run: `python hotel.py` for reconstruction task
+* Run: `python demo.py` for reconstruction task
 * Run: `python char_correction.py` for character-level correction task
 * Options: options can be made by changing `option` class in the demo.py code. 
 
