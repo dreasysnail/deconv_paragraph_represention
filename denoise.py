@@ -9,7 +9,6 @@ import scipy.io as sio
 from math import floor
 import pdb
 
-
 def add_noise(sents, opt):
     if opt.substitution == 's':
         sents_permutated= substitute_sent(sents, opt)
@@ -21,6 +20,8 @@ def add_noise(sents, opt):
         sents_permutated= delete_sent(sents, opt) 
     elif opt.substitution == 'm':
         sents_permutated= mixed_noise_sent(sents, opt)
+    elif opt.substitution == 'sc':
+        sents_permutated = substitute_sent_char(sents, opt)
     else:
         sents_permutated= sents
         

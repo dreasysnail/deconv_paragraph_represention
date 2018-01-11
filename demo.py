@@ -41,19 +41,17 @@ flags = tf.app.flags
 FLAGS = flags.FLAGS
 
 
-# flags.DEFINE_string('train_dir', 'data', 'Directory to put the training data.')
-
 class Options(object):
     def __init__(self):
         self.fix_emb = False
-        self.reuse_w = True
+        self.reuse_w = False
         self.reuse_cnn = False
         self.reuse_discrimination = True  # reuse cnn for discrimination
         self.restore = True
         self.tanh = True  # activation fun for the top layer of cnn, otherwise relu
         self.model = 'cnn_deconv'  # 'cnn_rnn', 'rnn_rnn' , default: cnn_deconv
 
-        self.permutation = 0
+        self.permutation = 50
         self.substitution = 's'  # Deletion(d), Insertion(a), Substitution(s) and Permutation(p)
 
         self.W_emb = None
@@ -115,9 +113,7 @@ def auto_encoder(x, x_org, opt, opt_t=None):
     else:
         H_enc = conv_model(x_emb, opt)
 
-    # H_dec = layers.relu(Y4, 200, biases_initializer=biasInit)
     H_dec = H_enc
-    # print x_rec.get_shape()
     # deconv decoder
     if opt.layer == 4:
         x_rec = deconv_model_4layer(H_dec, opt_t)  # batch L emb 1
@@ -130,12 +126,8 @@ def auto_encoder(x, x_org, opt, opt_t=None):
     tf.assert_equal(x_rec.get_shape(), x_emb.get_shape())
     tf.assert_equal(x_emb.get_shape()[1], x_org.get_shape()[1])
     x_rec_norm = normalizing(x_rec, 2)  # batch L emb
-    # W_reshape = tf.reshape(tf.transpose(W),[1,1,opt.embed_size,opt.n_words])
-    # print all_idx.get_shape()
 
     if opt.fix_emb:
-
-        # loss = tf.reduce_sum((x_emb-x_rec)**2) # L2 is bad
         # cosine sim
         # Batch L emb
         loss = -tf.reduce_sum(x_rec_norm * x_emb)
@@ -143,21 +135,15 @@ def auto_encoder(x, x_org, opt, opt_t=None):
         res['rec_sents'] = rec_sent
 
 
-        # print rec_sent.get_shape()
-        # rec_sent = tf.argmax(tf.reduce_mean(x_rec_norm[0,:,:] * W_reshape, 2),2)
-
     else:
         x_temp = tf.reshape(x_org, [-1, ])
         prob_logits = tf.tensordot(tf.squeeze(x_rec_norm), W_norm, [[2], [1]])  # c_blv = sum_e x_ble W_ve
 
         prob = tf.nn.log_softmax(prob_logits * opt_t.L, dim=-1, name=None)
-        # prob = normalizing(tf.reduce_sum(x_rec_norm * W_reshape, 2), 2)
-        # prob = softmax_prediction(x_rec_norm, opt)
         rec_sent = tf.squeeze(tf.argmax(prob, 2))
         prob = tf.reshape(prob, [-1, opt_t.n_words])
 
         idx = tf.range(opt.batch_size * opt_t.sent_len)
-        # print idx.get_shape(), idx.dtype
 
         all_idx = tf.transpose(tf.stack(values=[idx, x_temp]))
         all_prob = tf.gather_nd(prob, all_idx)
@@ -185,8 +171,7 @@ def auto_encoder(x, x_org, opt, opt_t=None):
                        tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.zeros_like(logits_syn), logits=logits_syn))
         else:
             loss = -tf.reduce_mean(all_prob)
-
-    # *tf.cast(tf.not_equal(x_temp,0), tf.float32)
+            
     tf.summary.scalar('loss', loss)
 
     train_op = layers.optimize_loss(
@@ -200,12 +185,12 @@ def auto_encoder(x, x_org, opt, opt_t=None):
 def main():
     # global n_words
     # Prepare training and testing data
-    # loadpath = "./data/three_corpus_small.p"
     loadpath = "./data/hotel_reviews.p"
     x = cPickle.load(open(loadpath, "rb"))
     train, val = x[0], x[1]
     wordtoix, ixtoword = x[2], x[3]
-
+    train = [list(s) for s in train]
+    test = [list(s) for s in test]
     opt = Options()
     opt.n_words = len(ixtoword) + 1
     ixtoword[opt.n_words - 1] = 'GO_'
@@ -230,17 +215,11 @@ def main():
         x_org_ = tf.placeholder(tf.int32, shape=[opt.batch_size, opt.sent_len])
         res_, loss_, train_op = auto_encoder(x_, x_org_, opt)
         merged = tf.summary.merge_all()
-        # opt.is_train = False
-        # res_val_, loss_val_, _ = auto_encoder(x_, x_org_, opt)
-        # merged_val = tf.summary.merge_all()
 
-    # tensorboard --logdir=run1:/tmp/tensorflow/ --port 6006
-    # writer = tf.train.SummaryWriter(opt.log_path, graph=tf.get_default_graph())
 
 
     uidx = 0
     config = tf.ConfigProto(log_device_placement=False, allow_soft_placement=True)
-    # config = tf.ConfigProto(device_count={'GPU':0})
     config.gpu_options.allow_growth = True
     np.set_printoptions(precision=3)
     np.set_printoptions(threshold=np.inf)
@@ -252,10 +231,7 @@ def main():
         sess.run(tf.global_variables_initializer())
         if opt.restore:
             try:
-                # pdb.set_trace()
-
                 t_vars = tf.trainable_variables()
-                # print([var.name[:-2] for var in t_vars])
                 loader = restore_from_save(t_vars, sess, opt)
 
             except Exception as e:
@@ -265,27 +241,12 @@ def main():
 
         for epoch in range(opt.max_epochs):
             print("Starting epoch %d" % epoch)
-            # if epoch >= 10:
-            #     print("Relax embedding ")
-            #     opt.fix_emb = False
-            #     opt.batch_size = 2
             kf = get_minibatches_idx(len(train), opt.batch_size, shuffle=True)
             for _, train_index in kf:
                 uidx += 1
                 sents = [train[t] for t in train_index]
 
-                if opt.substitution == 's':
-                    sents_permutated = substitute_sent(sents, opt)
-                elif opt.substitution == 'p':
-                    sents_permutated = permutate_sent(sents, opt)
-                elif opt.substitution == 'a':
-                    sents_permutated = add_sent(sents, opt)
-                elif opt.substitution == 'd':
-                    sents_permutated = delete_sent(sents, opt)
-                else:
-                    sents_permutated = sents
-
-                # sents[0] = np.random.permutation(sents[0])
+                sents_permutated = add_noise(sents, opt)
 
                 if opt.model != 'rnn_rnn' and opt.model != 'cnn_rnn':
                     x_batch_org = prepare_data_for_cnn(sents, opt)  # Batch L
@@ -296,12 +257,6 @@ def main():
                     x_batch = prepare_data_for_cnn(sents_permutated, opt)  # Batch L
                 else:
                     x_batch = prepare_data_for_rnn(sents_permutated, opt, is_add_GO=False)  # Batch L
-                # x_print = sess.run([x_emb],feed_dict={x_: x_train} )
-                # print x_print
-
-
-                # res = sess.run(res_, feed_dict={x_: x_batch, x_org_:x_batch_org})
-                # pdb.set_trace()
 
                 _, loss = sess.run([train_op, loss_], feed_dict={x_: x_batch, x_org_: x_batch_org})
 
@@ -310,16 +265,7 @@ def main():
                     valid_index = np.random.choice(len(val), opt.batch_size)
                     val_sents = [val[t] for t in valid_index]
 
-                    if opt.substitution == 's':
-                        val_sents_permutated = substitute_sent(val_sents, opt)
-                    elif opt.substitution == 'p':
-                        val_sents_permutated = permutate_sent(val_sents, opt)
-                    elif opt.substitution == 'a':
-                        val_sents_permutated = add_sent(val_sents, opt)
-                    elif opt.substitution == 'd':
-                        val_sents_permutated = delete_sent(val_sents, opt)
-                    else:
-                        val_sents_permutated = sents
+                    val_sents_permutated = add_noise(val_sents, opt)
 
                     if opt.model != 'rnn_rnn' and opt.model != 'cnn_rnn':
                         x_val_batch_org = prepare_data_for_cnn(val_sents, opt)
@@ -357,22 +303,12 @@ def main():
                         print "Reconstructed:" + " ".join([ixtoword[x] for x in res['rec_sents_feed_y'][0] if x != 0])
                     print "Reconstructed:" + " ".join([ixtoword[x] for x in res['rec_sents'][0] if x != 0])
 
+
                     summary = sess.run(merged, feed_dict={x_: x_batch, x_org_: x_batch_org})
                     train_writer.add_summary(summary, uidx)
-                    # print res['x_rec'][0][0]
-                    # print res['x_emb'][0][0]
 
             saver.save(sess, opt.save_path, global_step=epoch)
 
-
-            # model_fn = auto_encoder
-            # ae = learn.Estimator(model_fn=model_fn)
-            # ae.fit(train, opt , steps=opt.max_epochs)
-
-
-#
-# def main(argv=None):
-#     learn_runner.run(experiment_fn, FLAGS.train_dir)
 
 if __name__ == '__main__':
     main()

@@ -205,20 +205,7 @@ def run_model(opt, train, val, test, wordtoix, ixtoword):
                 uidx += 1
                 sents = [train[t] for t in train_index]
 
-                if opt.substitution == 's':
-                    sents_permutated = substitute_sent(sents, opt)
-                elif opt.substitution == 'p':
-                    sents_permutated = permutate_sent(sents, opt)
-                elif opt.substitution == 'a':
-                    sents_permutated = add_sent(sents, opt)
-                elif opt.substitution == 'd':
-                    sents_permutated = delete_sent(sents, opt)
-                elif opt.substitution == 'm':
-                    sents_permutated = mixed_noise_sent(sents, opt)
-                elif opt.substitution == 'sc':
-                    sents_permutated = substitute_sent_char(sents, opt)
-                else:
-                    sents_permutated = sents
+                sents_permutated = add_noise(sents, opt)
 
                 if opt.model != 'rnn_rnn' and opt.model != 'cnn_rnn':
                     x_batch_org = prepare_data_for_cnn(sents, opt) # Batch L
@@ -249,20 +236,7 @@ def run_model(opt, train, val, test, wordtoix, ixtoword):
                     valid_index = np.random.choice(len(val), opt.batch_size)
                     val_sents = [val[t] for t in valid_index]
 
-                    if opt.substitution == 's':
-                        val_sents_permutated = substitute_sent(val_sents, opt)
-                    elif opt.substitution == 'p':
-                        val_sents_permutated = permutate_sent(val_sents, opt)
-                    elif opt.substitution == 'a':
-                        val_sents_permutated = add_sent(val_sents, opt)
-                    elif opt.substitution == 'd':
-                        val_sents_permutated= delete_sent(val_sents, opt)
-                    elif opt.substitution == 'm':
-                        val_sents_permutated = mixed_noise_sent(val_sents, opt)
-                    elif opt.substitution == 'sc':
-                        val_sents_permutated= substitute_sent_char(val_sents, opt)
-                    else:
-                        val_sents_permutated= val_sents
+                    val_sents_permutated = add_noise(val_sents, opt)
 
                     if opt.model != 'rnn_rnn' and opt.model != 'cnn_rnn':
                         x_val_batch_org = prepare_data_for_cnn(val_sents, opt)
