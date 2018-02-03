@@ -83,7 +83,7 @@ def prepare_data_for_rnn(seqs_x, opt, is_add_GO = True):
     x = np.zeros(( n_samples, opt.sent_len)).astype('int32')
     for idx, s_x in enumerate(seqs_x):
         if is_add_GO:
-            x[idx, 0] = opt.n_words-1 # GO symbol
+            x[idx, 0] = 1 # GO symbol
             x[idx, 1:lengths_x[idx]+1] = s_x
         else:
             x[idx, :lengths_x[idx]] = s_x

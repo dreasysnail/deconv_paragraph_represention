@@ -32,6 +32,9 @@ def permutate_sent(sents, opt):
     sents_p = []
     for ss in range(len(sents)):
         sent_temp = sents[ss][:]
+        if len(sent_temp) <= 1: 
+            sents_p.append(sent_temp)
+            continue
         idx_s= np.random.choice(len(sent_temp)-1, size=opt.permutation, replace=True)
         temp = sent_temp[idx_s[0]]
         for ii in range(opt.permutation-1):
@@ -46,6 +49,9 @@ def substitute_sent(sents, opt):
     sents_p = []
     for ss in range(len(sents)):
         sent_temp = sents[ss][:]
+        if len(sent_temp) <= 1: 
+            sents_p.append(sent_temp)
+            continue
         idx_s= np.random.choice(len(sent_temp)-1, size=opt.permutation, replace=True)   
         for ii in range(opt.permutation):
             sent_temp[idx_s[ii]] = np.random.choice(opt.n_words)
@@ -57,6 +63,9 @@ def delete_sent(sents, opt):
     sents_p = []
     for ss in range(len(sents)):
         sent_temp = sents[ss][:]
+        if len(sent_temp) <= 1: 
+            sents_p.append(sent_temp)
+            continue
         idx_s= np.random.choice(len(sent_temp)-1, size=opt.permutation, replace=True)   
         for ii in range(opt.permutation):
             sent_temp[idx_s[ii]] = -1
@@ -68,6 +77,9 @@ def add_sent(sents, opt):
     sents_p = []
     for ss in range(len(sents)):
         sent_temp = sents[ss][:]
+        if len(sent_temp) <= 1: 
+            sents_p.append(sent_temp)
+            continue
         idx_s= np.random.choice(len(sent_temp)-1, size=opt.permutation, replace=True)   
         for ii in range(opt.permutation):
             sent_temp.insert(idx_s[ii], np.random.choice(opt.n_words))
@@ -86,6 +98,9 @@ def substitute_sent_char(sents, opt):
     sents_p = []
     for ss in range(len(sents)):
         sent_temp = sents[ss][:]
+        if len(sent_temp) <= 1: 
+            sents_p.append(sent_temp)
+            continue
         permute_choice = [ic for ic in range(len(sent_temp)) if sent_temp[ic] != 1]
         idx_s= np.random.choice(permute_choice, size=int(opt.permutation * (len(permute_choice))), replace=True)
 

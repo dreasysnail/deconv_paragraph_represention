@@ -10,6 +10,7 @@ Implementations of the models in the paper "Deconvolutional Paragraph Representa
 ## Run 
 * Run: `python demo.py` for reconstruction task
 * Run: `python char_correction.py` for character-level correction task
+* Run: `python semi_supervised.py` for semi-supervised task
 * Options: options can be made by changing `option` class in the demo.py code. 
 
 - `opt.n_hidden`: number of hidden units.

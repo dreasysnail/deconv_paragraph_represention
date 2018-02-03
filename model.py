@@ -67,6 +67,15 @@ def embedding_only(opt, prefix = '', is_reuse = None):
 
     return W_norm
 
+def classifier_2layer(H, opt, dropout = 1, prefix = '', num_outputs=1, is_reuse= None):
+    # last layer must be linear
+    H = tf.squeeze(H)
+    biasInit = tf.constant_initializer(0.001, dtype=tf.float32)
+    H_dis = layers.fully_connected(tf.nn.dropout(H, keep_prob = dropout), num_outputs = opt.H_dis, biases_initializer=biasInit, activation_fn = tf.nn.relu, scope = prefix + 'dis_1', reuse = is_reuse)
+    logits = layers.linear(tf.nn.dropout(H_dis, keep_prob = dropout), num_outputs = num_outputs, biases_initializer=biasInit, scope = prefix + 'dis_2', reuse = is_reuse)
+    return logits
+
+
 
 def discriminator(x, W, opt, prefix = 'd_', is_prob = False, is_reuse = None):
     W_norm_d = tf.identity(W)   # deep copy
@@ -186,12 +195,11 @@ def deconv_decoder(H_dec, x_org, W_norm, is_train, opt, res, prefix = '', is_reu
 
 
 def regularization(X, opt, is_train, prefix= '', is_reuse= None):
-    acf = tf.nn.tanh if opt.tanh else tf.nn.relu
     if '_X' not in prefix and '_H_dec' not in prefix:
         if opt.batch_norm:
             X = layers.batch_norm(X, decay=0.9, center=True, scale=True, is_training=is_train, scope=prefix+'_bn', reuse = is_reuse)
-        X = acf(X)
-    X = X if (not opt.dropout or is_train is None) else layers.dropout(X, keep_prob = opt.dropout_ratio, scope=prefix + '_dropout')
+        X = tf.nn.relu(X)
+    X = X if not opt.cnn_layer_dropout else layers.dropout(X, keep_prob = opt.dropout_ratio, scope=prefix + '_dropout')
 
     return X
 
@@ -233,7 +241,7 @@ def conv_model_3layer(X, opt, prefix = '', is_reuse= None, num_outputs = None, i
     H2 = layers.conv2d(H1,  num_outputs=opt.filter_size*multiplier,  kernel_size=[opt.filter_shape, 1], stride = [opt.stride[1],1],  biases_initializer=biasInit, activation_fn=None, padding = 'VALID', scope = prefix + 'H2_3', reuse = is_reuse)
     #print H2.get_shape()
     H2 = regularization(H2, opt,  prefix= prefix + 'reg_H2', is_reuse= is_reuse, is_train = is_train)
-    H3 = layers.conv2d(H2,  num_outputs= (num_outputs if num_outputs else opt.n_gan),  kernel_size=[opt.sent_len3, 1], activation_fn=conv_acf , padding = 'VALID', scope = prefix + 'H3_3', reuse = is_reuse) # batch 1 1 2*Filtersize
+    H3 = layers.conv2d(H2,  num_outputs= (num_outputs if num_outputs else opt.n_gan),  kernel_size=[opt.sent_len3, 1], activation_fn=tf.nn.tanh , padding = 'VALID', scope = prefix + 'H3_3', reuse = is_reuse) # batch 1 1 2*Filtersize
 
     #pdb.set_trace()
     return H3
