@@ -80,6 +80,7 @@ class Options(object):
 
         # batch norm & dropout
         self.batch_norm = False
+        self.cnn_layer_dropout = False
         self.dropout = False
         self.dropout_ratio = 0.5
 
