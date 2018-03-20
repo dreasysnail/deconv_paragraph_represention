@@ -191,7 +191,7 @@ def main():
     train, val = x[0], x[1]
     wordtoix, ixtoword = x[2], x[3]
     train = [list(s) for s in train]
-    test = [list(s) for s in test]
+    val = [list(s) for s in val]
     opt = Options()
     opt.n_words = len(ixtoword) + 1
     ixtoword[opt.n_words - 1] = 'GO_'
