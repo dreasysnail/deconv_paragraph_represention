@@ -25,7 +25,7 @@ Implementations of the models in the paper "Deconvolutional Paragraph Representa
 * Download from :
 	* Reconstruction: [Hotel review (1.52GB)](https://drive.google.com/file/d/0B52eYWrYWqIpQzhBNkVxaV9mMjQ/view)
 	* Char-level correction: [Yahoo! review (character-level, 451MB)](https://drive.google.com/open?id=1kBIAWyi3kvcMme-_1q4OU881yWH_j3ki)
-	* Semi-supervised classification: [Yelps review (629MB)](https://drive.google.com/open?id=0B52eYWrYWqIpQzhBNkVxaV9mMjQ)
+	* Semi-supervised classification: [Yelps review (629MB)](https://drive.google.com/open?id=1qKos_wB45MzMu7Sn8RdvE6SRVAKCTC6e)
 
 
 ## Citation 
@@ -39,4 +39,4 @@ Please cite our paper if it helps with your research
   year={2017}
 }
 ```
-For any question or suggestions, feel free to contact yz196@duke.edu
+For any question or suggestions, feel free to contact yizhe.zhang@microsoft.com
