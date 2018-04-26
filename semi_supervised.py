@@ -124,13 +124,13 @@ def semi_classifier(alpha, x, x_org, x_lab, y, dp_ratio, opt, opt_t=None):
 
     # cnn encoder
     H_enc, res = conv_encoder(x_emb, is_train, opt, res)
-    H_lab_enc, res = conv_encoder(x_lab_emb, is_train, opt, res)
+    H_lab_enc, res = conv_encoder(x_lab_emb, is_train, opt, res, is_reuse = True)
     H_dec = H_enc
 
     #H_lab_enc = tf.nn.dropout(H_lab_enc, opt.dropout_ratio)
-    logits = classifier_2layer(H_lab_enc, opt, dropout = dp_ratio, prefix='classify', is_reuse=True)
+    logits = classifier_2layer(H_lab_enc, opt, dropout = dp_ratio, prefix='classify', is_reuse=None)
     dis_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=y, logits=logits))
-
+    
     # calculate the accuracy
     prob = tf.nn.sigmoid(logits)
 
