@@ -3,8 +3,9 @@
 Implementations of the models in the paper "Deconvolutional Paragraph Representation Learning" by Yizhe Zhang, Dinghan Shen, Guoyin Wang, Zhe Gan, Ricardo Henao and Lawrence Carin, NIPS 2017
 
 ## Prerequisite: 
-* Tensorflow (version >1.0). We used tensorflow 1.2.
 * CUDA, cudnn
+* Tensorflow (version >1.0). We used tensorflow 1.2.
+Run: `pip install -r requirements.txt` to install requirements
 
 
 ## Run 
