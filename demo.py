@@ -51,7 +51,7 @@ class Options(object):
         self.tanh = True  # activation fun for the top layer of cnn, otherwise relu
         self.model = 'cnn_deconv'  # 'cnn_rnn', 'rnn_rnn' , default: cnn_deconv
 
-        self.permutation = 50
+        self.permutation = 0
         self.substitution = 's'  # Deletion(d), Insertion(a), Substitution(s) and Permutation(p)
 
         self.W_emb = None
