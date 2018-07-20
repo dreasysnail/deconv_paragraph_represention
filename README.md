@@ -19,14 +19,14 @@ Run: `pip install -r requirements.txt` to install requirements
 - `opt.lr`: learning rate.
 - `opt.batch_size`: number of batchsize.
 
-* Training roughly takes 6-7 hours (around 10 epochs) (for recontruction task) to converge on a K80 GPU machine.
+* Training roughly takes 6-7 hours (around 10-20 epochs) (for recontruction task) to converge on a K80 GPU machine.
 * See `output.txt` for a sample of screen output for reconstruction task.
 
 ## Data: 
 * Download from :
 	* Reconstruction: [Hotel review (1.52GB)](https://drive.google.com/file/d/0B52eYWrYWqIpQzhBNkVxaV9mMjQ/view)
 	* Char-level correction: [Yahoo! review (character-level, 451MB)](https://drive.google.com/open?id=1kBIAWyi3kvcMme-_1q4OU881yWH_j3ki)
-	* Semi-supervised classification: [Yelps review (629MB)](https://drive.google.com/open?id=1qKos_wB45MzMu7Sn8RdvE6SRVAKCTC6e)
+	* Semi-supervised classification: [Yelp review (629MB)](https://drive.google.com/open?id=1qKos_wB45MzMu7Sn8RdvE6SRVAKCTC6e)
 
 
 ## Citation 
