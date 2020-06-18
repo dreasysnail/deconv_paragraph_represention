@@ -1,4 +1,4 @@
-# CNN-DCNN text autoencoder
+# Deconvolutional Paragraph Representation Learning
 
 Implementations of the models in the paper "Deconvolutional Paragraph Representation Learning" by Yizhe Zhang, Dinghan Shen, Guoyin Wang, Zhe Gan, Ricardo Henao and Lawrence Carin, NIPS 2017
 
